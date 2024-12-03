@@ -36,9 +36,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/hsnborn22/LinGo/src/languageHandler"
-	"github.com/hsnborn22/LinGo/src/terminalSize"
-	"github.com/hsnborn22/LinGo/src/translator"
+	"github.com/jaredmontoya/lingo/src/languageHandler"
+	"github.com/jaredmontoya/lingo/src/terminalSize"
+	"github.com/jaredmontoya/lingo/src/translator"
 )
 
 /*

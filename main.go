@@ -11,13 +11,13 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/hsnborn22/LinGo/src/audioPlayer"
-	"github.com/hsnborn22/LinGo/src/fileReader"
-	"github.com/hsnborn22/LinGo/src/interfaceLanguage"
-	"github.com/hsnborn22/LinGo/src/languageHandler"
-	"github.com/hsnborn22/LinGo/src/strokeOrder"
-	"github.com/hsnborn22/LinGo/src/terminalSize"
-	"github.com/hsnborn22/LinGo/src/translator"
+	"github.com/jaredmontoya/lingo/src/audioPlayer"
+	"github.com/jaredmontoya/lingo/src/fileReader"
+	"github.com/jaredmontoya/lingo/src/interfaceLanguage"
+	"github.com/jaredmontoya/lingo/src/languageHandler"
+	"github.com/jaredmontoya/lingo/src/strokeOrder"
+	"github.com/jaredmontoya/lingo/src/terminalSize"
+	"github.com/jaredmontoya/lingo/src/translator"
 )
 
 //go:embed src/translator/hanzi.json

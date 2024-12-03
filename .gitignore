@@ -1,3 +1,11 @@
+# Compiled binaries
+lingo
+!lingo/
+
+# Gitignore for the following technologies: Nix
+.direnv
+result
+
 # Gitignore for the following technologies: Python
 
 # Byte-compiled / optimized / DLL files
@@ -63,6 +71,3 @@ cython_debug/
 
 # Go workspace file
 go.work
-
-# Binaries
-LinGo

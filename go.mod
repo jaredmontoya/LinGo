@@ -1,4 +1,4 @@
-module github.com/hsnborn22/LinGo
+module github.com/jaredmontoya/lingo
 
 go 1.21.4
 
