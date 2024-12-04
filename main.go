@@ -103,10 +103,10 @@ type model struct {
 	currentLanguage string          // This is the current language we're studying
 	currentError    string          // This is the current error that go cathced; in this way, if something goes wrong with the APIs the app
 	// doesn't crash, it just notifies the user and tells you what went wrong.
-	bootLanguage  string              // This is the language of the interface (if you're reading this I assume you speak english and thus it will be english)
-	languageTable table.Model         // This is the table listing all the languages (new UI)
-	textTable     table.Model         // This is the table listing all the text files we can open inside the app (new UI).
-	hanziData     map[string][]string // This is the map that stores the pinyin equivalent of the most common hanzi in simplified mandarin chinese
+	interfaceLanguage string              // This is the language of the interface (if you're reading this I assume you speak english and thus it will be english)
+	languageTable     table.Model         // This is the table listing all the languages (new UI)
+	textTable         table.Model         // This is the table listing all the text files we can open inside the app (new UI).
+	hanziData         map[string][]string // This is the map that stores the pinyin equivalent of the most common hanzi in simplified mandarin chinese
 }
 
 /*
@@ -114,17 +114,17 @@ This function initializes the bubbletea model to boot the application; this is o
 in terms of code and it needs a serious refactor.
 */
 func initialModel() model {
-	// Get the boot language from the bootLanguage.txt file by reading it.
-	bootLang, _ := os.ReadFile("setup/bootLanguage.txt")
+	// Get the interface language from the interfaceLanguage.txt file by reading it.
+	interfaceLang, _ := os.ReadFile("setup/interfaceLanguage.txt")
 	// Convert the []byte object we got into a string
-	bootLangString := string(bootLang)
+	interfaceLangString := string(interfaceLang)
 	// These 4 lines of code just make sure to remove all the possible spaces, new lines and tabular spaces.
-	stripped := strings.ReplaceAll(bootLangString, "\t", "")
+	stripped := strings.ReplaceAll(interfaceLangString, "\t", "")
 	stripped = strings.ReplaceAll(stripped, " ", "")
 	stripped = strings.ReplaceAll(stripped, "\n", "")
-	bootLangString = stripped
+	interfaceLangString = stripped
 
-	languageTitle := interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[bootLangString]][0]
+	languageTitle := interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[interfaceLangString]][0]
 	columns := []table.Column{
 		{Title: languageTitle, Width: 35},
 	}
@@ -163,7 +163,7 @@ func initialModel() model {
 		Background(lipgloss.Color("57")).
 		Bold(false)
 	t.SetStyles(s)
-	textTitle := interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[bootLangString]][3]
+	textTitle := interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[interfaceLangString]][3]
 	columns2 := []table.Column{
 		{Title: textTitle, Width: 35},
 	}
@@ -186,15 +186,15 @@ func initialModel() model {
 
 	// return the model object we need to start the bubbletea app.
 	return model{
-		choices:       filePaths,
-		choices2:      directories,
-		viewIndex:     2,
-		cursor2:       0,
-		currentError:  "",
-		bootLanguage:  bootLangString,
-		languageTable: t,
-		textTable:     t2,
-		hanziData:     translator.InitHanzi(hanzi),
+		choices:           filePaths,
+		choices2:          directories,
+		viewIndex:         2,
+		cursor2:           0,
+		currentError:      "",
+		interfaceLanguage: interfaceLangString,
+		languageTable:     t,
+		textTable:         t2,
+		hanziData:         translator.InitHanzi(hanzi),
 	}
 }
 
@@ -254,10 +254,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// If the key pressed is f, generate a dictionary file.
 			case "f":
 				dictionary := fileReader.MakeDictFromMenu(m.currentLanguage)
-				fileReader.MakeDictionary(dictionary, m.currentLanguage, m.bootLanguage)
+				fileReader.MakeDictionary(dictionary, m.currentLanguage, m.interfaceLanguage)
 			case "z":
 				dictionary := fileReader.MakeDictFromMenu(m.currentLanguage)
-				fileReader.MakeAltDictionary(dictionary, m.currentLanguage, m.bootLanguage, m.hanziData)
+				fileReader.MakeAltDictionary(dictionary, m.currentLanguage, m.interfaceLanguage, m.hanziData)
 			}
 		}
 
@@ -349,7 +349,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// get translation
 			case "5":
 				currentlLanguageId := languageHandler.LanguageMap2[m.currentLanguage]
-				translation, errString := translator.Translate2(m.openedFileText.TokenList[m.openedFileText.TokenCursorPosition], currentlLanguageId, m.bootLanguage)
+				translation, errString := translator.Translate2(m.openedFileText.TokenList[m.openedFileText.TokenCursorPosition], currentlLanguageId, m.interfaceLanguage)
 				m.currentError = errString
 				m.openedFileText.CurrentTranslate = translation
 
@@ -362,21 +362,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.currentError += err.Error()
 				}
 			case "8":
-				url := fmt.Sprintf("https://translate.google.com/?sl=%s&tl=%s&text=%s&op=translate", languageHandler.LanguageMap2[m.currentLanguage], m.bootLanguage, m.openedFileText.TokenList[m.openedFileText.TokenCursorPosition])
+				url := fmt.Sprintf("https://translate.google.com/?sl=%s&tl=%s&text=%s&op=translate", languageHandler.LanguageMap2[m.currentLanguage], m.interfaceLanguage, m.openedFileText.TokenList[m.openedFileText.TokenCursorPosition])
 				err := strokeOrder.OpenBrowser(url)
 				if err != nil {
 					m.currentError += err.Error()
 				}
 			case "9":
 				currentlLanguageId := languageHandler.LanguageMap2[m.currentLanguage]
-				translation, errString := translator.Translate(m.openedFileText.TokenList[m.openedFileText.TokenCursorPosition], currentlLanguageId, m.bootLanguage)
+				translation, errString := translator.Translate(m.openedFileText.TokenList[m.openedFileText.TokenCursorPosition], currentlLanguageId, m.interfaceLanguage)
 				m.currentError = errString
 				m.openedFileText.CurrentTranslate = translation
 
 			case "f":
-				fileReader.MakeDictionary(m.openedFileText.WordLevels, m.currentLanguage, m.bootLanguage)
+				fileReader.MakeDictionary(m.openedFileText.WordLevels, m.currentLanguage, m.interfaceLanguage)
 			case "z":
-				fileReader.MakeAltDictionary(m.openedFileText.WordLevels, m.currentLanguage, m.bootLanguage, m.hanziData)
+				fileReader.MakeAltDictionary(m.openedFileText.WordLevels, m.currentLanguage, m.interfaceLanguage, m.hanziData)
 
 			// Move the cursor to the beginning of the current page.
 			case "m":
@@ -427,7 +427,7 @@ func (m model) View() string {
 	var s string
 	if m.viewIndex == 0 {
 		// The header
-		s = interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.bootLanguage]][2] + m.currentLanguage + "\n"
+		s = interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.interfaceLanguage]][2] + m.currentLanguage + "\n"
 		s += "\n"
 
 		// Iterate over our choices
@@ -435,17 +435,17 @@ func (m model) View() string {
 		s += baseStyle.Render(m.textTable.View())
 
 		// The footer
-		s += interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.bootLanguage]][4]
-		s += interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.bootLanguage]][5]
-		s += "\n" + interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.bootLanguage]][1] + "\n"
+		s += interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.interfaceLanguage]][4]
+		s += interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.interfaceLanguage]][5]
+		s += "\n" + interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.interfaceLanguage]][1] + "\n"
 	} else if m.viewIndex == 1 {
 		wordsPerLine := terminalSize.GetWordsPerLine()
 		linesPerPage := terminalSize.GetLinesPerPage()
 		width, height := terminalSize.GetTerminalSize()
 
-		s = interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.bootLanguage]][6] + m.openedFile + interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.bootLanguage]][7]
+		s = interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.interfaceLanguage]][6] + m.openedFile + interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.interfaceLanguage]][7]
 		s += fmt.Sprintf("%v", m.openedFileText.TokenCursorPosition)
-		s += fmt.Sprintf("\n%s %v %v\n", interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.bootLanguage]][8], width, height)
+		s += fmt.Sprintf("\n%s %v %v\n", interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.interfaceLanguage]][8], width, height)
 		s += "\n"
 		for k, element := range m.openedFileText.PageList[m.openedFileText.CurrentPage] {
 			var padding1 string = ""
@@ -477,13 +477,13 @@ func (m model) View() string {
 		}
 		s += "\n"
 		s += fmt.Sprintf("%v", m.openedFileText.CurrentPage)
-		s += fmt.Sprintf("\n%s %v", interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.bootLanguage]][9], m.openedFileText.Pages)
+		s += fmt.Sprintf("\n%s %v", interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.interfaceLanguage]][9], m.openedFileText.Pages)
 		s += "\n"
-		s += fmt.Sprintf("%s %s", interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.bootLanguage]][10], m.openedFileText.CurrentTranslate)
+		s += fmt.Sprintf("%s %s", interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.interfaceLanguage]][10], m.openedFileText.CurrentTranslate)
 		s += "\n"
-		s += fmt.Sprintf("%s %s", interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.bootLanguage]][13], m.openedFileText.CurrentLatinization)
-		s += "\n" + interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.bootLanguage]][11] + m.currentError
-		s += "\n" + interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.bootLanguage]][12] + "\n" + interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.bootLanguage]][1]
+		s += fmt.Sprintf("%s %s", interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.interfaceLanguage]][13], m.openedFileText.CurrentLatinization)
+		s += "\n" + interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.interfaceLanguage]][11] + m.currentError
+		s += "\n" + interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.interfaceLanguage]][12] + "\n" + interfaceLanguage.InterfaceLanguage[interfaceLanguage.LanguagesCodeMap[m.interfaceLanguage]][1]
 	} else if m.viewIndex == 2 {
 		return baseStyle.Render(m.languageTable.View()) + "\n"
 	}

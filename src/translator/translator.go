@@ -84,11 +84,11 @@ This function takes in a text in the source language and returns a translation i
 the target language.
 */
 
-func Translate(text string, languageId string, bootLanguage string) (string, string) {
+func Translate(text string, languageId string, interfaceLanguage string) (string, string) {
 	// This piece of code encodes the text in url encoding (since it might possibly be a not valid url)
 	encodedText := url.QueryEscape(text) + "%s"
 	// The url to which we will perform the get request.
-	apiurl := fmt.Sprintf("https://api.mymemory.translated.net/get?q=%s&langpair=%s|%s", encodedText, languageId, bootLanguage)
+	apiurl := fmt.Sprintf("https://api.mymemory.translated.net/get?q=%s&langpair=%s|%s", encodedText, languageId, interfaceLanguage)
 	// Response and error object originating from the request to the above url.
 	response, err := http.Get(apiurl)
 	// If there is an error, print it out to the console.
@@ -128,9 +128,9 @@ func Translate(text string, languageId string, bootLanguage string) (string, str
 	}
 }
 
-func Translate2(text string, languageId string, bootLanguage string) (string, string) {
+func Translate2(text string, languageId string, interfaceLanguage string) (string, string) {
 	t := translator.New()
-	result, err := t.Translate(text, languageId, bootLanguage)
+	result, err := t.Translate(text, languageId, interfaceLanguage)
 	if err != nil {
 		return "", err.Error()
 	}

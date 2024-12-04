@@ -418,7 +418,7 @@ como estas, how are you
 These files can then be exported and made into flashcards using Anki or memrise.
 */
 
-func MakeDictionary(data map[string]int, language string, bootLanguage string) {
+func MakeDictionary(data map[string]int, language string, interfaceLanguage string) {
 	// Path where we will save our dictionary file.
 	filename := fmt.Sprintf("languages/%s/dictionary.txt", language)
 	// Declare the finalString variable and initialize it to empty string "".
@@ -432,7 +432,7 @@ func MakeDictionary(data map[string]int, language string, bootLanguage string) {
 		if v == 1 || v == 2 {
 			// get the translation via the API
 			languageId := languageHandler.LanguageMap2[language]
-			translation, _ := translator.Translate2(k, languageId, bootLanguage)
+			translation, _ := translator.Translate2(k, languageId, interfaceLanguage)
 			// append to the finalString
 			finalString += fmt.Sprintf("%s, %s\n", k, translation)
 		}
@@ -473,7 +473,7 @@ Example:
 These files can then be exported and made into flashcards using Anki or memrise.
 */
 
-func MakeAltDictionary(data map[string]int, language string, bootLanguage string, hanziData map[string][]string) {
+func MakeAltDictionary(data map[string]int, language string, interfaceLanguage string, hanziData map[string][]string) {
 	// Path where we will save our dictionary file.
 	filename := fmt.Sprintf("languages/%s/dictionary.txt", language)
 	// Declare the finalString variable and initialize it to empty string "".
@@ -487,7 +487,7 @@ func MakeAltDictionary(data map[string]int, language string, bootLanguage string
 		if v == 1 || v == 2 {
 			// get the translation via the API
 			languageId := languageHandler.LanguageMap2[language]
-			translation, _ := translator.Translate2(k, languageId, bootLanguage)
+			translation, _ := translator.Translate2(k, languageId, interfaceLanguage)
 			latinization := translator.LatinizeText(k, hanziData, language)
 			// append to the finalString
 			finalString += fmt.Sprintf("%s, %s (%s)\n", k, translation, latinization)
